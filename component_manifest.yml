@@ -1,0 +1,14 @@
+# The component manifest file for the Price Forecaster component
+
+Name: PriceForecaster
+Type: platform
+Description: "Price Forecaster component for the SimCes Platform"
+DockerImage: ghcr.io/simcesplatform/price-forecaster
+Attributes:
+    PriceForecasterStateCsvFile:
+        Environment: PRICE_FORECASTER_STATE_CSV_FILE
+        Optional: false
+    PriceForecasterStateCsvDelimiter:
+        Environment: PRICE_FORECASTER_STATE_CSV_DELIMITER
+        Optional: true
+        Default: ","
