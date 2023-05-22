@@ -8,6 +8,9 @@ Attributes:
     PriceForecasterStateCsvFile:
         Environment: PRICE_FORECASTER_STATE_CSV_FILE
         Optional: false
+    ForecastHorizon:
+        Environment: FORECAST_HORIZON
+        Optional: false
     PriceForecasterStateCsvDelimiter:
         Environment: PRICE_FORECASTER_STATE_CSV_DELIMITER
         Optional: true

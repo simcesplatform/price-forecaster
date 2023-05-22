@@ -7,6 +7,9 @@
 Contains classes related to reading price forecast state from a csv file.
 '''
 from dataclasses import dataclass
+from isodate import parse_duration
+from tools.tools import FullLogger
+LOGGER = FullLogger( __name__ )
 
 import csv
 
@@ -37,11 +40,14 @@ class CsvFilePriceStateSource():
     Class for getting price forecast states from a csv file.
     '''
     
-    def __init__(self, file_name: str, delimiter: str = ","  ):
+    def __init__(self, file_name: str,horizon:str, delimiter: str = ","  ):
         '''
         Creates object which uses the given csv file that uses the given delimiter.
         Raises CsvFileError if file cannot be read e.g. file not found, or it is missing required columns.
         '''
+        self._horizon = int(parse_duration(horizon).total_seconds())/3600   # duration in hours
+        LOGGER.info("horizon is calculated:{}".format(self._horizon))
+        
         self._file = None # required if there is no file and the __del__ method is executed
         try:
             self._file = open( file_name, newline = "")
@@ -108,12 +114,14 @@ class CsvFilePriceStateSource():
 
         # no_interval is the number of time intervals for which time stamp and price data are provided in the csv file. It is assumed
         # that in the row, all other data are removed and we only have price abd timestamp data 
-        no_interval = int(len(row)/2)
+        
+        #no_interval = int(len(row)/2)
         timedata_list = []
         pricedata_list = []
 
-        
-        for i in range(no_interval):
+        LOGGER.info("horizon's type is:{}".format(type(int(self._horizon))))
+
+        for i in range(int(self._horizon)):
             timeind='Time'+str(i+1)
             priceind='Price'+str(i+1)
             timedata_list.append(row[timeind])
@@ -123,5 +131,5 @@ class CsvFilePriceStateSource():
         values['pricedata']=pricedata_list        
         
         state = PriceForecastState( **values )
-
+        LOGGER.info("state is:{}".format(state))
         return state

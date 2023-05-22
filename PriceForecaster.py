@@ -17,6 +17,7 @@ from price_forecaster_state_source.price_forecast_state_source  import CsvFilePr
 PRICE_FORECASTER_STATE_CSV_FILE = "PRICE_FORECASTER_STATE_CSV_FILE"
 PRICE_FORECASTER_STATE_CSV_DELIMITER = "PRICE_FORECASTER_STATE_CSV_DELIMITER"
 PRICE_FORECAST_STATE_TOPIC = "PRICE_FORECAST_STATE_TOPIC"
+FORECAST_HORIZON="FORECAST_HORIZON"
 
 
 LOGGER = FullLogger( __name__ )
@@ -60,6 +61,7 @@ class PriceForecaster(AbstractSimulationComponent):
     async def _send_PriceForecast_state_message(self):
         priceforecaststate = self._get_PriceForecast_state_message()
 
+        LOGGER.info("sending message is:{}".format(priceforecaststate))
         #state = self._stateSource.getCurrentEpochData()
 
         #self._result_topic = '.'.join( [ self._result_topic, state.market_id, state.resource_id])
@@ -94,15 +96,15 @@ class PriceForecaster(AbstractSimulationComponent):
 def create_component() -> PriceForecaster:
     environment = load_environmental_variables(
         ( PRICE_FORECASTER_STATE_CSV_FILE, str ),
+        ( FORECAST_HORIZON, str ),
         ( PRICE_FORECASTER_STATE_CSV_DELIMITER, str, "," )
         )
     try:
-        stateSource = CsvFilePriceStateSource( environment[PRICE_FORECASTER_STATE_CSV_FILE], environment[PRICE_FORECASTER_STATE_CSV_DELIMITER])
+        stateSource = CsvFilePriceStateSource( environment[PRICE_FORECASTER_STATE_CSV_FILE],environment[FORECAST_HORIZON], environment[PRICE_FORECASTER_STATE_CSV_DELIMITER])
         initialization_error = None
     except CsvFileError as error:
         stateSource = None
         initialization_error = f'Unable to create a csv file for the component: {str( error )}'
-
     return PriceForecaster(stateSource, initialization_error )
 
 async def start_component():
